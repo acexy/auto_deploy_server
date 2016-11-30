@@ -1,0 +1,18 @@
+{
+  "apps" : [{
+    "name"        : "auto_deploy",
+    "script"      : "index.js",
+    "exec_mode"  : "cluster",
+    "instances"  : 1,
+    "watch"       : true,
+    "ignore_watch": ["node_modules","pid", "logs"],
+    "error_file" : "/home/dev/autoDeploy/logs/err.log",
+    "out_file"   : "/home/dev/autoDeploy/logs/out.log",
+    "pid_file"   : "./pid/child.pid",
+    "node_args"   : "--harmony",
+    "merge_logs"  : true,
+    "env": {
+        "NODE_ENV": "dev_local"
+    }
+  }]
+}

@@ -1,0 +1,27 @@
+{
+  "name": "auto_deploy",
+  "version": "0.0.1",
+  "description": "基于gulp自动部署",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "gulp": "latest",
+    "gulp-sftp": "latest",
+    "gulp-watch": "latest"
+  },
+  "author": "acexy",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thankjava/auto_deploy.git"
+  },
+  "keywords": [
+    "自动部署"
+  ],
+  "bugs": {
+    "url": "https://github.com/thankjava/auto_deploy/issues"
+  },
+  "homepage": "https://github.com/thankjava/auto_deploy#readme"
+}

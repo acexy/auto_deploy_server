@@ -1,0 +1,92 @@
+/**
+ * Created by Zxy on 2016/11/25.
+ */
+var gulp = require('gulp'),
+    cmd = require('../shell_cmd/cmd'),
+    sftp = require('gulp-sftp');
+
+var envConfig = global.config.envConfig;
+var watchRootPath = global.config.system.watchRootPath;
+
+
+// 处理完成的任务数量
+var completedUploadTask = 0;
+
+function upload(changedSort) {
+    for (var index in changedSort) {
+        var servers = envConfig[index];
+        for (var len in servers) {
+            var uploadInfo = {};
+            uploadInfo.changedFile = changedSort[index];
+            uploadInfo.base = watchRootPath + index;
+            uploadInfo.server = servers[len]
+            uploadAndRestart(uploadInfo);
+        }
+    }
+
+};
+
+function uploadAndRestart(uploadInfo) {
+    var server = uploadInfo.server;
+    gulp.src(uploadInfo.changedFile, {base: uploadInfo.base}).pipe(
+        sftp({
+            host: server.host,
+            user: server.user,
+            pass: server.pass,
+            port: server.port,
+            remotePath: server.remotePath,
+            callback: function () {
+                cmd.exe(server.cmd, function () {
+                    completedUploadTask++;
+                    console.log(
+                        '目录: ' + uploadInfo.base
+                        + ' 已成功上传至: [' + server.host + '] 并重启完成 当前完成任务数: '
+                        + completedUploadTask
+                        + ' 需要完成数目: ' + global.config.totalUploadTask
+                    );
+                });
+            }
+        })
+    );
+
+}
+
+// 检查当前状态是否正在上传
+var uploading = false;
+
+
+// 这个定时任务在一直查看是否需要做上传处理
+setInterval(function () {
+
+    if (uploading) {
+        return;
+    }
+
+    if (global.config.totalUploadTask > 0) {
+        console.log('开始上传文件 需要处理的任务数量: ' + global.config.totalUploadTask);
+        uploading = true;
+        upload(global.config.changedSort);
+
+    }
+
+}, 500);
+
+// 这个定时任务在一直查看如果有上传任务是否已经全部完成
+setInterval(function () {
+
+    if (!uploading) {
+        return;
+    }
+
+    if (global.config.totalUploadTask > 0) {
+        console.log('文件处理中');
+    }
+
+    if (global.config.totalUploadTask == completedUploadTask) {
+        global.config.totalUploadTask = completedUploadTask = 0;
+        uploading = false;
+        global.config.changedSort = {};
+        console.log('所有任务上传完毕');
+    }
+
+}, 500);
