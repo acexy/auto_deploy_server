@@ -17,11 +17,8 @@ var watchFilesChanged = false;
 // 监听到的文件变化的路径
 var changedFilesPath = [];
 
-// 当前发现的文件更改数量
-var currChangedCount = 0;
-
-// 上次检测发现的文件更改数量
-var lastChangedCount = 0;
+// 在sftp上传过程中发现的文件更改
+var changedFilesPathToWait = [];
 
 module.exports.watch = function () {
 
@@ -46,16 +43,24 @@ module.exports.watch = function () {
         // 文件变更事件非删除
         if (dataCallback.event != 'unlink') {
             if (changedFilesPath.indexOf(dataCallback.path) == -1) {
-                watchFilesChanged = true;
-                console.log('监控到文件变更: ' + dataCallback.path);
-                // 将所有的变化文件push到变更数组中
-                changedFilesPath.push(dataCallback.path);
+                // 判断当前是否有sftp和重启任务正在进行
+                if (global.config.uploading) {
+                    console.log('监控到文件变更（已有任务正在执行）: ' + dataCallback.path);
+                    changedFilesPathToWait.push(dataCallback.path)
+                } else {
+                    watchFilesChanged = true;
+                    console.log('监控到文件变更: ' + dataCallback.path);
+                    // 将所有的变化文件push到变更数组中
+                    changedFilesPath.push(dataCallback.path);
+                }
             }
         }
     });
 
 };
 
+// 是否开始了文件上传等待
+var toStart = false;
 
 // 按照配置配置的时 定时检查是否有更新文件
 // 这个时间是批量上传的延时时间
@@ -66,57 +71,60 @@ module.exports.watch = function () {
 // 大于指定延迟时间后才会去上传并重启服务
 setInterval(function () {
 
-    if (!watchFilesChanged) {
-        return;
+    if (watchFilesChanged) {
+        if (toStart) {
+            return;
+        }
+        toStart = true;
+        console.log('等待%s ms 后开始上传', global.config.system.watchDelayTime);
+        // 发现了文件变更
+        setTimeout(function () {
+            watchFilesChanged = false;
+            toStart = false;
+            console.log('终止等待文件上传');
+            sortChangedFile();
+        }, global.config.system.watchDelayTime);
     }
 
-    lastChangedCount = currChangedCount;
-    currChangedCount = changedFilesPath.length;
+}, 500);
 
-    if (lastChangedCount == currChangedCount) {
-        console.log('终止等待文件上传,此次变更文件汇总: ');
-        // 对发生变化的文件进行各个环境分类
-        sortChangedFile();
-    } else {
-        console.log('等待所有文件上传完毕...');
+
+// 这个任务是检查是否有堆积的文件变化情况
+setInterval(function () {
+    if (changedFilesPathToWait.length > 0) {
+        if (!global.config.uploading) {
+
+            // 发现有堆积的文件变化并且上传任务已经完成
+            // 则将这些变化的文件推给任务进行处理
+
+            console.log('堆积的文件变化开始处理');
+            changedFilesPath = changedFilesPathToWait;
+            watchFilesChanged = true;
+            changedFilesPathToWait = [];
+        }
     }
-
-}, global.config.system.watchDelayTime);
+}, 1000);
 
 /**
  * 将watch模块得到的所有文件变化汇总
  * 按照配置环境进行分类
  */
 function sortChangedFile() {
-
     var changedSort = {};
-
     for (var index in changedFilesPath) {
-
         var path = changedFilesPath[index];
-
         var pathSplit = path.replace(watchRootPath, '').split(global.config.fileSeparator);
-
         var buildKey = '';
-
         for (var len = 1; len < 4; len++) {
             buildKey += global.config.fileSeparator + pathSplit[len];
         }
-
         if (!changedSort[buildKey]) {
             changedSort[buildKey] = [path];
         } else {
             changedSort[buildKey].push(path);
         }
     }
-
-
-    lastChangedCount = currChangedCount = 0;
     changedFilesPath = [];
-    watchFilesChanged = false;
-
-    console.log(changedSort);
-
     var totalUploadTask = 0;
     for (var index in changedSort) {
         var servers = envConfig[index];
@@ -127,5 +135,4 @@ function sortChangedFile() {
     // 写入全局变量中
     global.config.changedSort = changedSort;
     global.config.totalUploadTask = totalUploadTask;
-
 }

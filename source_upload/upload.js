@@ -23,8 +23,7 @@ function upload(changedSort) {
             uploadAndRestart(uploadInfo);
         }
     }
-
-};
+}
 
 function uploadAndRestart(uploadInfo) {
     var server = uploadInfo.server;
@@ -51,42 +50,36 @@ function uploadAndRestart(uploadInfo) {
 
 }
 
-// 检查当前状态是否正在上传
-var uploading = false;
-
-
 // 这个定时任务在一直查看是否需要做上传处理
 setInterval(function () {
 
-    if (uploading) {
+    if (global.config.uploading) {
+        // 已经有任务开始执行
         return;
     }
 
     if (global.config.totalUploadTask > 0) {
         console.log('开始上传文件 需要处理的任务数量: ' + global.config.totalUploadTask);
-        uploading = true;
+        global.config.uploading = true;
         upload(global.config.changedSort);
 
     }
-
 }, 500);
 
 // 这个定时任务在一直查看如果有上传任务是否已经全部完成
 setInterval(function () {
-
-    if (!uploading) {
+    if (!global.config.uploading) {
+        // 没有任务执行
         return;
     }
 
-    if (global.config.totalUploadTask > 0) {
-        console.log('文件处理中');
-    }
-
     if (global.config.totalUploadTask == completedUploadTask) {
+        // 所有任务已经完成
         global.config.totalUploadTask = completedUploadTask = 0;
-        uploading = false;
+        global.config.uploading = false;
         global.config.changedSort = {};
         console.log('所有任务上传完毕');
+    } else {
+        console.log('任务处理中');
     }
-
 }, 500);

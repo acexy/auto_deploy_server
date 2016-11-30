@@ -5,7 +5,6 @@ var os = require('os');
 var fs = require('fs');
 var util = require('util');
 
-
 // const BASE_CONFIG_PATH = 'E:\\data';
 const BASE_CONFIG_PATH = '/home/dev/autoDeploy/config';
 
@@ -23,6 +22,7 @@ function readFileSync(fileName) {
 global.config = {};
 global.config.changedSort = {};
 global.config.totalUploadTask = 0;
+global.config.uploading = false;
 
 /**
  * 加載配置文件信息
@@ -53,33 +53,18 @@ function disposeConfig() {
     var osType = os.platform();
 
     var fileSeparator = '/';
-
     if (osType.startsWith('win')) {
         fileSeparator = '\\';
     }
-
     global.config.fileSeparator = fileSeparator;
 
     var config = global.config;
-
     var envs = config.envs;
-
     var servers = config.servers;
-
     var envConfig = {};
 
-    // 平台
-    var platform;
-    // 环境
-    var env;
-    // 模块
-    var module;
-    // 服务器
-    var server;
-    // 服务器配置
-    var serverConfig;
-
-    var cmd;
+    // 平台 环境 模块 服务器 服务器配置
+    var platform, env, module, server, serverConfig, cmd;
 
     // 遍历平台配置 - cbank / funpay
     for (var platformKey in envs) {
