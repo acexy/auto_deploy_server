@@ -42,8 +42,8 @@ function loadConfig() {
 
     // 读取完毕后处理这些简单的配置文件将一些属性组装处理下以备后面方便使用
     disposeConfig();
-    console.log('配置文件处理完毕: ');
-    console.log(JSON.stringify(global.config.envConfig, null, 4));
+    // console.log('配置文件处理完毕: ');
+    // console.log(JSON.stringify(global.config.envConfig, null, 4));
 }
 
 module.exports.loadConfig = loadConfig;

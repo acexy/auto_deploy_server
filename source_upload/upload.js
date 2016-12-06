@@ -41,7 +41,7 @@ function uploadAndRestart(uploadInfo) {
                         '目录: ' + uploadInfo.base
                         + ' 已成功上传至: [' + server.host + '] 并重启完成 当前完成任务数: '
                         + completedUploadTask
-                        + ' 需要完成数目: ' + global.config.totalUploadTask
+                        + ' 需要完成任务数: ' + global.config.totalUploadTask
                     );
                 });
             }
