@@ -47,7 +47,6 @@ function uploadAndRestart(uploadInfo) {
             }
         })
     );
-
 }
 
 // 这个定时任务在一直查看是否需要做上传处理
@@ -64,7 +63,7 @@ setInterval(function () {
         upload(global.config.changedSort);
 
     }
-}, 500);
+}, 1);
 
 // 这个定时任务在一直查看如果有上传任务是否已经全部完成
 setInterval(function () {
