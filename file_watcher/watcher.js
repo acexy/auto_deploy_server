@@ -54,6 +54,8 @@ module.exports.watch = function () {
                     changedFilesPath.push(dataCallback.path);
                 }
             }
+        } else {
+            // 检测到了删除事件
         }
     });
 
