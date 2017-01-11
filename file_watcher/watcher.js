@@ -86,6 +86,7 @@ setInterval(function () {
             return;
         }
         toStart = true;
+
         console.log('等待%s ms 后开始上传', global.config.system.watchDelayTime);
         // 发现了文件变更
         setTimeout(function () {
@@ -97,6 +98,27 @@ setInterval(function () {
     }
 
 }, 500);
+
+
+// 固定延时
+// setInterval(function () {
+//
+//     if (watchFilesChanged) {
+//         if (toStart) {
+//             return;
+//         }
+//         toStart = true;
+//         console.log('等待%s ms 后开始上传', global.config.system.watchDelayTime);
+//         // 发现了文件变更
+//         setTimeout(function () {
+//             watchFilesChanged = false;
+//             toStart = false;
+//             console.log('终止等待文件上传');
+//             sortChangedFile();
+//         }, global.config.system.watchDelayTime);
+//     }
+//
+// }, 500);
 
 
 // 这个任务是检查是否有堆积的文件变化情况
