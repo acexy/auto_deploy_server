@@ -56,6 +56,14 @@ module.exports.watch = function () {
             }
         } else {
             // 检测到了删除事件
+            var index = changedFilesPathToWait.indexOf(dataCallback.path);
+            if(index != -1){
+                if (global.config.uploading) {
+                    delete changedFilesPathToWait[index];
+                } else {
+                    delete changedFilesPath[index];
+                }
+            }
         }
     });
 
@@ -115,6 +123,9 @@ function sortChangedFile() {
     var changedSort = {};
     for (var index in changedFilesPath) {
         var path = changedFilesPath[index];
+        if(!path){
+            continue;
+        }
         var pathSplit = path.replace(watchRootPath, '').split(global.config.fileSeparator);
         var buildKey = '';
         for (var len = 1; len < 4; len++) {
