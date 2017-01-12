@@ -106,7 +106,7 @@ setInterval(function () {
         console.log('检测到文件变动，等待' + global.config.system.watchDelayTime + 'ms');
     }
 
-}, 500);
+}, global.config.system.watchDelayTime);
 
 
 // 固定延时
