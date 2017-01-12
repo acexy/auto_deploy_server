@@ -56,13 +56,20 @@ module.exports.watch = function () {
             }
         } else {
             // 检测到了删除事件
-            var index = changedFilesPathToWait.indexOf(dataCallback.path);
-            if(index != -1){
-                if (global.config.uploading) {
-                    delete changedFilesPathToWait[index];
-                } else {
-                    delete changedFilesPath[index];
+            console.log('检查到了文件删除:' + dataCallback.path);
+
+            if (global.config.uploading) {
+                var index = changedFilesPathToWait.indexOf(dataCallback.path);
+                if(index == -1){
+                    return;
                 }
+                delete changedFilesPathToWait[index];
+            } else {
+                var index = changedFilesPath.indexOf(dataCallback.path);
+                if(index == -1){
+                    return;
+                }
+                delete changedFilesPath[index];
             }
         }
     });
@@ -79,25 +86,27 @@ var toStart = false;
 // 文件还在持续上传不会去立马推到目标服务器并重启
 // 理论上系统在发现文件没有发生变化的两次间隔时间
 // 大于指定延迟时间后才会去上传并重启服务
+var lastChangedCount, currChangedCount = 0;
 setInterval(function () {
 
-    if (watchFilesChanged) {
-        if (toStart) {
-            return;
-        }
-        toStart = true;
-
-        console.log('等待%s ms 后开始上传', global.config.system.watchDelayTime);
-        // 发现了文件变更
-        setTimeout(function () {
-            watchFilesChanged = false;
-            toStart = false;
-            console.log('终止等待文件上传');
-            sortChangedFile();
-        }, global.config.system.watchDelayTime);
+    if (!watchFilesChanged) {
+        return;
     }
 
-}, 500);
+    lastChangedCount = currChangedCount;
+    currChangedCount = changedFilesPath.length;
+
+    if (lastChangedCount == currChangedCount) {
+        watchFilesChanged = false;
+        lastChangedCount = currChangedCount = 0;
+        console.log('未检测到文件持续变动,终止等待，开始上传');
+        // 对发生变化的文件进行各个环境分类
+        sortChangedFile();
+    } else {
+        console.log('检测到文件变动，等待' + global.config.system.watchDelayTime + 'ms');
+    }
+
+}, global.config.system.watchDelayTime);
 
 
 // 固定延时
@@ -145,7 +154,7 @@ function sortChangedFile() {
     var changedSort = {};
     for (var index in changedFilesPath) {
         var path = changedFilesPath[index];
-        if(!path){
+        if (!path) {
             continue;
         }
         var pathSplit = path.replace(watchRootPath, '').split(global.config.fileSeparator);
@@ -159,7 +168,12 @@ function sortChangedFile() {
             changedSort[buildKey].push(path);
         }
     }
+
     changedFilesPath = [];
+    if (Object.keys(changedSort).length == 0) {
+        console.log('--->> 发生变动的文件已被删除，没有需要上传的任务');
+        return;
+    }
     var totalUploadTask = 0;
     for (var index in changedSort) {
         var servers = envConfig[index];
