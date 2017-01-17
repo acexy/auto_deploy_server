@@ -33,8 +33,8 @@ module.exports.watch = function () {
         );
     }
 
-    console.log('开始监听以下目录: ');
-    console.log(JSON.stringify(watchAllPath, null, 4));
+    console.log('开始监听以下目录: '.green);
+    console.log((JSON.stringify(watchAllPath, null, 4)).white);
 
     // 开启对文件的监听
     watch(watchAllPath, 'changed', function (dataCallback) {
@@ -44,18 +44,18 @@ module.exports.watch = function () {
             if (changedFilesPath.indexOf(dataCallback.path) == -1) {
                 // 判断当前是否有sftp和重启任务正在进行
                 if (global.config.uploading) {
-                    console.log('监控到文件变更（已有任务正在执行）: ' + dataCallback.path);
+                    console.log(('监控到文件变更（已有任务正在执行）: ' + dataCallback.path).yellow);
                     changedFilesPathToWait.push(dataCallback.path)
                 } else {
                     watchFilesChanged = true;
-                    console.log('监控到文件变更: ' + dataCallback.path);
+                    console.log(('监控到文件变更: ' + dataCallback.path).green);
                     // 将所有的变化文件push到变更数组中
                     changedFilesPath.push(dataCallback.path);
                 }
             }
         } else {
             // 检测到了删除事件
-            console.log('监控到了文件删除:' + dataCallback.path);
+            console.log(('监控到了文件删除:' + dataCallback.path).red);
 
             if (global.config.uploading) {
                 var index = changedFilesPathToWait.indexOf(dataCallback.path);
@@ -94,7 +94,7 @@ setInterval(function () {
     }
     if(!beginWatch){
         watchTimes = 0;
-        console.log('检测到文件变动，等待' + global.config.system.watchDelayTime + 'ms 等待文件上次完毕');
+        console.log(('检测到文件变动，等待上传完毕所有文件 ' + global.config.system.watchDelayTime + 'ms ').yellow);
     }
     beginWatch = true;
 
@@ -113,12 +113,12 @@ setInterval(function () {
         beginWatch = false;
         watchFilesChanged = false;
         lastChangedCount = currChangedCount = 0;
-        console.log('未检测到文件持续变动,终止等待，开始上传');
+        console.log('未检测到文件持续变动,终止等待，开始上传'.green);
         // 对发生变化的文件进行各个环境分类
         sortChangedFile();
     } else {
         if(watchTimes != 0){
-            console.log('持续检测到文件变动，等待' + global.config.system.watchDelayTime + 'ms 等待文件上次完毕');
+            console.log(('持续检测到文件变动，等待上传完毕所有文件' + global.config.system.watchDelayTime + 'ms').red);
         }
         watchTimes ++;
     }
@@ -153,7 +153,7 @@ setInterval(function () {
             // 发现有堆积的文件变化并且上传任务已经完成
             // 则将这些变化的文件推给任务进行处理
 
-            console.log('开始处理堆积的文件变化');
+            console.log(('开始处理堆积的文件变化').white);
             changedFilesPath = changedFilesPathToWait;
             watchFilesChanged = true;
             changedFilesPathToWait = [];
@@ -186,7 +186,7 @@ function sortChangedFile() {
 
     changedFilesPath = [];
     if (Object.keys(changedSort).length == 0) {
-        console.log('发生变动的文件已被删除，没有需要上传的任务');
+        console.log('发生变动的文件已被删除，没有需要上传的任务'.red);
         return;
     }
     var totalUploadTask = 0;

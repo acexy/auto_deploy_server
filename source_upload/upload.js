@@ -39,9 +39,9 @@ function uploadAndRestart(uploadInfo) {
                     completedUploadTask++;
                     console.log(
                         '目录: ' + uploadInfo.base
-                        + ' 已成功上传至: [' + server.host + '] 并重启完成 当前完成任务数: '
-                        + completedUploadTask
-                        + ' 需要完成任务数: ' + global.config.totalUploadTask
+                        + (' 已成功上传至: [' + server.host + '] 并重启完成 ').green +('当前完成任务数: '
+                        + completedUploadTask).yellow
+                        + (' 需要完成任务数: ' + global.config.totalUploadTask).red
                     );
                 });
             }
@@ -58,7 +58,7 @@ setInterval(function () {
     }
 
     if (global.config.totalUploadTask > 0) {
-        console.log('开始上传文件 需要处理的任务数量: ' + global.config.totalUploadTask);
+        console.log(('开始上传文件 需要处理的任务数量: ' + global.config.totalUploadTask).red);
         global.config.uploading = true;
         upload(global.config.changedSort);
 
@@ -77,8 +77,8 @@ setInterval(function () {
         global.config.totalUploadTask = completedUploadTask = 0;
         global.config.uploading = false;
         global.config.changedSort = {};
-        console.log('所有任务上传完毕');
+        console.log('所有任务上传完毕'.green);
     } else {
-        console.log('任务处理中');
+        console.log('任务处理中'.yellow);
     }
 }, 500);

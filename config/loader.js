@@ -5,6 +5,7 @@ var os = require('os');
 var fs = require('fs');
 var util = require('util');
 
+
 // const BASE_CONFIG_PATH = 'E:\\data';
 const BASE_CONFIG_PATH = '/home/dev/autoDeploy/config';
 
@@ -16,7 +17,11 @@ const CFG_FILE_LIST = {
 
 
 function readFileSync(fileName) {
-    return fs.readFileSync(BASE_CONFIG_PATH + '/' + fileName, 'utf8');
+    try {
+        return fs.readFileSync(BASE_CONFIG_PATH + '/' + fileName, 'utf8');
+    } catch (e) {
+        console.log(('加载配置文件异常: ' + BASE_CONFIG_PATH + '/' + fileName).yellow);
+    }
 }
 
 global.config = {};
@@ -29,15 +34,24 @@ global.config.uploading = false;
  */
 function loadConfig() {
 
-    console.log('配置加载...');
+    console.log('配置加载...'.white);
     // 读取所有配置文件
     for (jsonKey in CFG_FILE_LIST) {
         try {
-            global.config[jsonKey] = JSON.parse(readFileSync(CFG_FILE_LIST[jsonKey]));
+            var content = readFileSync(CFG_FILE_LIST[jsonKey]);
+            if(!content){
+                continue;
+            }
+            global.config[jsonKey] = JSON.parse(content);
         } catch (e) {
-            console.error('load config error: ', e);
-            break;
+            console.info(('配置文件内容错误: ' + content).yellow, e);
+            continue;
         }
+    }
+    if(Object.keys(global.config).length == 3){
+        console.log('未能成功的加载到配置文件信息，程序退出'.red);
+        process.exit();
+        return;
     }
 
     // 读取完毕后处理这些简单的配置文件将一些属性组装处理下以备后面方便使用

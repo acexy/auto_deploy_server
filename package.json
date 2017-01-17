@@ -9,7 +9,8 @@
   "dependencies": {
     "gulp": "latest",
     "gulp-sftp": "latest",
-    "gulp-watch": "latest"
+    "gulp-watch": "latest",
+    "colour": "latest"
   },
   "author": "acexy",
   "license": "ISC",
