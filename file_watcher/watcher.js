@@ -10,7 +10,6 @@ var watch = require('gulp-watch');
 var watchRootPath = global.config.system.watchRootPath;
 var envConfig = global.config.envConfig;
 
-
 // 是否监听到了文件变化
 var watchFilesChanged = false;
 
@@ -56,17 +55,17 @@ module.exports.watch = function () {
             }
         } else {
             // 检测到了删除事件
-            console.log('检查到了文件删除:' + dataCallback.path);
+            console.log('监控到了文件删除:' + dataCallback.path);
 
             if (global.config.uploading) {
                 var index = changedFilesPathToWait.indexOf(dataCallback.path);
-                if(index == -1){
+                if (index == -1) {
                     return;
                 }
                 delete changedFilesPathToWait[index];
             } else {
                 var index = changedFilesPath.indexOf(dataCallback.path);
-                if(index == -1){
+                if (index == -1) {
                     return;
                 }
                 delete changedFilesPath[index];
@@ -76,8 +75,6 @@ module.exports.watch = function () {
 
 };
 
-// 是否开始了文件上传等待
-var toStart = false;
 
 // 按照配置配置的时 定时检查是否有更新文件
 // 这个时间是批量上传的延时时间
@@ -87,9 +84,25 @@ var toStart = false;
 // 理论上系统在发现文件没有发生变化的两次间隔时间
 // 大于指定延迟时间后才会去上传并重启服务
 var lastChangedCount, currChangedCount = 0;
+
+// 是否开始了文件上传等待
+var beginWatch = false;
 setInterval(function () {
 
     if (!watchFilesChanged) {
+        return;
+    }
+    if(!beginWatch){
+        watchTimes = 0;
+        console.log('检测到文件变动，等待' + global.config.system.watchDelayTime + 'ms 等待文件上次完毕');
+    }
+    beginWatch = true;
+
+}, 500);
+
+var watchTimes = 0;
+setInterval(function () {
+    if(!beginWatch){
         return;
     }
 
@@ -97,17 +110,19 @@ setInterval(function () {
     currChangedCount = changedFilesPath.length;
 
     if (lastChangedCount == currChangedCount) {
+        beginWatch = false;
         watchFilesChanged = false;
         lastChangedCount = currChangedCount = 0;
         console.log('未检测到文件持续变动,终止等待，开始上传');
         // 对发生变化的文件进行各个环境分类
         sortChangedFile();
     } else {
-        console.log('检测到文件变动，等待' + global.config.system.watchDelayTime + 'ms');
+        if(watchTimes != 0){
+            console.log('持续检测到文件变动，等待' + global.config.system.watchDelayTime + 'ms 等待文件上次完毕');
+        }
+        watchTimes ++;
     }
-
 }, global.config.system.watchDelayTime);
-
 
 // 固定延时
 // setInterval(function () {
@@ -138,7 +153,7 @@ setInterval(function () {
             // 发现有堆积的文件变化并且上传任务已经完成
             // 则将这些变化的文件推给任务进行处理
 
-            console.log('堆积的文件变化开始处理');
+            console.log('开始处理堆积的文件变化');
             changedFilesPath = changedFilesPathToWait;
             watchFilesChanged = true;
             changedFilesPathToWait = [];
@@ -171,7 +186,7 @@ function sortChangedFile() {
 
     changedFilesPath = [];
     if (Object.keys(changedSort).length == 0) {
-        console.log('--->> 发生变动的文件已被删除，没有需要上传的任务');
+        console.log('发生变动的文件已被删除，没有需要上传的任务');
         return;
     }
     var totalUploadTask = 0;
