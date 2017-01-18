@@ -1,6 +1,6 @@
 # auto_deploy 基于 node gulp及watch组件
 
-    自动部署工程，上传code到目标服务器，执行远程ssh重启应用（用于实际开发中部署各个环境的服务，减少部署成本）
+    自动部署工程服务，上传code到目标服务器，执行远程ssh重启应用（用于实际开发中部署各个环境的服务，减少部署成本）
     Gulp介绍（中文）： http://www.gulpjs.com.cn/ 
     github（英文）： https://github.com/gulpjs/gulp   
 ---
