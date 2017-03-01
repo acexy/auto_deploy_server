@@ -38,6 +38,7 @@ module.exports.watch = function () {
 
     // 开启对文件的监听
     watch(watchAllPath, 'changed', function (dataCallback) {
+        console.log(dataCallback.event);
 
         // 文件变更事件非删除
         if (dataCallback.event != 'unlink') {
