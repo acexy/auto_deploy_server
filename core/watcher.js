@@ -18,7 +18,7 @@ var changedFilesPathArray = [];
 var startUploadTimer;
 
 // 正在执行上传动作
-var uploading = false;
+global.config.uploading = false;
 
 module.exports.watch = function () {
 
@@ -41,7 +41,7 @@ module.exports.watch = function () {
         events: ['change', 'add'],
         awaitWriteFinish: {
             stabilityThreshold: 3000,
-            pollInterval: 100
+            pollInterval: 500
         }
     }, function (dataCallback) {
         if (changedFilesPathArray.indexOf(dataCallback.path) == -1) {
@@ -56,12 +56,10 @@ module.exports.watch = function () {
 // 开启上传
 function startUpload() {
     // 验证并处理发生变化的文件
-    console.log(uploading);
-    while (!uploading) {
+    while (!global.config.uploading) {
         console.log('文件变更终止,开始上传'.red);
         verificationChangedFiles(changedFilesPathArray);
         changedFilesPathArray = [];
-        uploading = true;
         return;
     }
 }
@@ -98,6 +96,5 @@ function verificationChangedFiles(changedFiles) {
             totalTasks++;
         }
     }
-
-    upload.upload(changedFilesPath, totalTasks, uploading);
+    upload.upload(changedFilesPath, totalTasks);
 }

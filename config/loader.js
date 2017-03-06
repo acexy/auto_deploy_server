@@ -6,7 +6,9 @@ var fs = require('fs');
 var util = require('util');
 
 
-// const BASE_CONFIG_PATH = 'E:\\data';
+global.config = {};
+global.config.uploading = false;
+
 const BASE_CONFIG_PATH = '/home/dev/autoDeploy/config';
 
 const CFG_FILE_LIST = {
@@ -23,11 +25,6 @@ function readFileSync(fileName) {
         console.log(('加载配置文件异常: ' + BASE_CONFIG_PATH + '/' + fileName).yellow);
     }
 }
-
-global.config = {};
-global.config.changedSort = {};
-global.config.totalUploadTask = 0;
-global.config.uploading = false;
 
 /**
  * 加載配置文件信息
@@ -56,8 +53,6 @@ function loadConfig() {
 
     // 读取完毕后处理这些简单的配置文件将一些属性组装处理下以备后面方便使用
     disposeConfig();
-    // console.log('配置文件处理完毕: ');
-    // console.log(JSON.stringify(global.config.envConfig, null, 4));
 }
 
 module.exports.loadConfig = loadConfig;
