@@ -5,7 +5,6 @@
 var process = require('child_process');
 
 module.exports.exe = function (cmd, cb) {
-
     try {
         process.exec(cmd, function (error, stdout, stderr) {
 
@@ -21,6 +20,4 @@ module.exports.exe = function (cmd, cb) {
         console.log(e);
         cb();
     }
-
-
 };
