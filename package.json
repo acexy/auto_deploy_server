@@ -1,8 +1,8 @@
 {
   "name": "auto_deploy",
-  "version": "1.0.1",
-  "description": "基于gulp自动部署",
-  "main": "index.js",
+  "version": "2.0.0",
+  "description": "自动部署服务管理",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
