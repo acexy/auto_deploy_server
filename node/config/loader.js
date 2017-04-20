@@ -26,7 +26,7 @@ function readFileSync(fileName) {
     }
 }
 
-/**
+/*
  * 加載配置文件信息
  */
 function loadConfig() {
