@@ -24,3 +24,8 @@
 所以请保证startup.sh所在的目录只启动了单个进程
 ```
 * shutdown.sh是按照start.sh启动时写入到的.pid(默认)文件中的pid号进行kill的
+* startup1.sh及shutdown1.sh是另外一套对应的启动重启脚本
+```
+    startup1.sh&shutdown1.sh不使用保存pid的方式，在停止进程时不再通过记录的pid文件
+去指定kill，而是时时查询当前目录启动的进程进行kill
+```
