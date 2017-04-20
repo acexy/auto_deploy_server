@@ -12,7 +12,9 @@ echo_red () {
 DIR=`dirname $0`
 cd $DIR
 
-PID=`ps -ef | grep $DIR | grep -v grep | grep -v $0 | awk '{print $2}'`
+DI=`pwd`
+
+PID=`ps -ef | grep $DIR | grep -v grep | awk '{print $2}'`
 if [ "$PID" = "" ]; then
     echo_red "未能查找到有效的pid号"
 else
