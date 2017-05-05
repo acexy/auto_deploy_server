@@ -20,6 +20,7 @@ if [ "$PID" = "" ]; then
 else
     kill $PID
     if [ $? -eq 0 ]; then
+        sleep 2
         echo_green "已成功发送kill命令pid: $PID"
     else
         echo_red "发送kill命令后得到失败结果pid: $PID"
