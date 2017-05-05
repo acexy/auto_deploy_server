@@ -12,7 +12,7 @@ echo_red () {
 DIR=`dirname $0`
 cd $DIR
 
-DI=`pwd`
+DIR=`pwd`
 
 PID=`ps -ef | grep $DIR | grep -v grep | awk '{print $2}'`
 if [ "$PID" = "" ]; then
