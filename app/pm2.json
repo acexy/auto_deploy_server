@@ -14,11 +14,7 @@
       "error_file": "./logs/err.log",
       "out_file": "./logs/out.log",
       "pid_file": "./pid/child.pid",
-      "node_args": "--harmony",
-      "merge_logs": true,
-      "env": {
-        "NODE_ENV": "dev_local"
-      }
+      "merge_logs": true
     }
   ]
 }
