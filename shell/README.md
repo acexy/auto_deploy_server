@@ -20,12 +20,8 @@
 ## 说明
 * 进程的查找是按照脚本所在的目录进行ps查找的
 ```
-    例如startup.sh 处于/data/app/java/user中 则ps 进程查找为ps /data/app/java/user
+    例如startup.sh处于/data/app/java/user中, 则ps关键信息是'ps /data/app/java/user'
 所以请保证startup.sh所在的目录只启动了单个进程
 ```
-* shutdown.sh是按照start.sh启动时写入到的.pid(默认)文件中的pid号进行kill的
-* startup1.sh及shutdown1.sh是另外一套对应的启动重启脚本
-```
-    startup1.sh&shutdown1.sh不使用保存pid的方式，在停止进程时不再通过记录的pid文件
-去指定kill，而是时时查询当前目录启动的进程进行kill
-```
+* shutdown.sh&startup.sh 进程pid存储在脚本所在的目录.pid文件中
+* startup1.sh&shutdown1.sh 进程pid不存储在文件，需要时直接查找目录的进程pid
