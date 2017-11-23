@@ -27,7 +27,7 @@ DIR=`pwd`
 
 # 以得到的完整路径为ps搜索条件判断是否能ps到相关进程信息
 PID=`ps -ef | grep $DIR | grep -v grep | grep -v bash`
-if [ "$PID" != "" ]; then  # 是否ps到相关信息
+if [ "$PID" == "" ]; then  # 是否ps到相关信息
     # 执行启动命令 自定义
     STARTCMD
     sleep $SLEEPTIME
